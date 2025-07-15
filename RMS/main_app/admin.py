@@ -1,5 +1,5 @@
 from django.contrib import admin
-from main_app.models import UserInformation, Role, JobPost, InterviewScheduling, CandidateStatus
+from main_app.models import UserInformation, Role, JobPost, InterviewScheduling, CandidateStatus, Skills, JobDesignation, AppliedJobs
 
 admin.site.site_title = 'RMS'
 admin.site.site_header = 'RMS'
@@ -19,12 +19,27 @@ class UserInformationAdmin(admin.ModelAdmin):
     list_filter = ('role', 'is_verified')
     search_fields = ('username', 'email')
 
+@admin.register(Skills)
+class SkillsAdmin(admin.ModelAdmin):
+    list_display = ('id','name')
+    list_display_links = ('id','name')
+
 @admin.register(JobPost)
 class JobPostAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'location', 'mode', 'experience_year', 'experience_month', 'created_by', 'created_at')
     list_display_links = ('id', 'title')
     list_filter = ('location', 'mode')
     search_fields = ('title',)
+
+@admin.register(JobDesignation)
+class JobDesignationAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+    list_display_links = ('id', 'name')
+
+@admin.register(AppliedJobs)
+class AppliedJobsAdmin(admin.ModelAdmin):
+    list_display = ('user', 'job_post')
+    list_display_links = ('user', 'job_post')
 
 @admin.register(InterviewScheduling)
 class InterviewSchedulingAdmin(admin.ModelAdmin):
