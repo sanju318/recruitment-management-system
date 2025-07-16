@@ -52,6 +52,8 @@ class JobPost(models.Model):
 
 class JobDesignation(models.Model):
     name = models.CharField(max_length=20)
+    def __str__(self):
+        return self.name
     
 class AppliedJobs(models.Model):
     user = models.ForeignKey(UserInformation,on_delete=models.CASCADE)

@@ -1,9 +1,14 @@
+import random
+from django.utils import timezone
+from rest_framework.decorators import api_view
 from django.shortcuts import render
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework import status # import for login api 
+from django.contrib.auth.hashers import check_password #for hash password
+from django.contrib.auth.hashers import make_password  #for hash password
 from .models import UserInformation,Role,JobPost,InterviewScheduling,CandidateStatus,JobDesignation
 
-@api_view(["GET","POST"])
+@api_view(["GET"])
 def Recruiterview(request):
     method = request.method
     if method == "GET":
@@ -15,4 +20,86 @@ def Recruiterview(request):
             l = {"name":i.username,"email":i.email} #create dictionaty to show json data in postman
             stf.append(l)
         return Response(stf)
+
+#sign up api
     
+@api_view(["POST"]) 
+def signup(request):
+    data = request.data.copy()  # make a mutable copy
+    
+    raw_password = data.get("password")  #for hash password
+    hashed_password = make_password(data.get(raw_password)) #for hash password
+
+    try:
+        role_id = data.get("role")  # should be a string or int
+        role = Role.objects.get(id=role_id)
+    except Role.DoesNotExist:
+        return Response({"error": "Invalid role ID"}, status=400)
+
+    # Extract other fields
+    username = data.get("username")
+    email = data.get("email")
+    phone = data.get("phone")
+    password=hashed_password,
+    otp = data.get("otp")
+    profile_image = request.FILES.get("profile_image")
+
+    # Create user
+    user = UserInformation.objects.create(
+        username=username,
+        email=email,
+        phone=phone,
+        password=password,
+        otp=otp,
+        role=role,
+        profile_image=profile_image
+    )
+
+    return Response({"message": "User created", "user_id": user.id})
+
+# login api
+    
+@api_view(["POST"]) 
+def login(request):
+    username = request.data.get("username")
+    password = request.data.get("password")
+    
+    if not username or not password:
+        return Response({"error": "Username and password are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        user = UserInformation.objects.get(username=username)
+        print(user)
+        
+        if user.password==password:
+            return Response({"message": "Login successful", "username": user.username}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Invalid password"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    except UserInformation.DoesNotExist:
+        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+
+@api_view(["POST"]) 
+def generate_otp(request):
+    username = request.data.get("username")
+    
+    try:
+        user = UserInformation.objects.get(username=username)
+        
+        otp_code = str(random.randint(100000, 999999))
+        
+        user_otp = otp_code
+        user.otp_created_at = timezone.now()
+        user.save()
+        
+        print(f"otp sent to{user.username}:{otp_code}")
+
+        return Response({
+            "message": "OTP generated and stored successfully",
+            "username": user.username,
+            "otp": otp_code
+        }, status=status.HTTP_200_OK)
+        
+    except UserInformation.DoesNotExist:
+        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
