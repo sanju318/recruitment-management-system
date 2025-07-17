@@ -26,6 +26,9 @@ class UserInformation(models.Model):
 
 class Skills(models.Model):
     name = models.CharField(max_length=20)
+    
+    def __str__(self):
+        return self.name
 
 class JobPost(models.Model):
     # id = models.IntegerField()
@@ -49,6 +52,9 @@ class JobPost(models.Model):
     created_by = models.ForeignKey(UserInformation,on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.title
 
 class JobDesignation(models.Model):
     name = models.CharField(max_length=20)
@@ -87,14 +93,15 @@ class InterviewScheduling(models.Model):
 
 class CandidateStatus(models.Model):
     # id = models.IntegerField()
+    # name = models.CharField(max_length=50)
     user = models.ForeignKey(UserInformation,on_delete=models.CASCADE)
     resume = models.FileField(upload_to='CandidateStatus/', max_length=255)
     skills = models.ForeignKey(Skills,on_delete=models.CASCADE)
     experience = models.FloatField()
     education = models.CharField(max_length=50)
     
-        # def __str__(self):
-        #     return f"{self.name}"
+    def __str__(self):
+        return f"{self.user}"
 
 
 

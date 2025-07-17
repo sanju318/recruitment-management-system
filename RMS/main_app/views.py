@@ -93,7 +93,7 @@ def generate_otp(request):
         user.otp_created_at = timezone.now()
         user.save()
         
-        print(f"otp sent to{user.username}:{otp_code}")
+        print(f"otp sent to {user.username}:{otp_code}")
 
         return Response({
             "message": "OTP generated and stored successfully",
@@ -103,3 +103,17 @@ def generate_otp(request):
         
     except UserInformation.DoesNotExist:
         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+@api_view(["GET"])
+def filter_by(request):
+    # name = request.GET.get('username', '')
+
+    # data = UserInformation.objects.filter(username__icontains=name).values()
+    # return Response(list(data))
+
+    id = request.GET.get('id', '')
+
+    data = UserInformation.objects.filter(id__icontains=id).values()
+    return Response(list(data))
+    
+

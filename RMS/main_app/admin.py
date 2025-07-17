@@ -50,6 +50,6 @@ class InterviewSchedulingAdmin(admin.ModelAdmin):
 
 @admin.register(CandidateStatus)
 class CandidateStatusAdmin(admin.ModelAdmin):
-    list_display = ('id', 'skills', 'experience', 'education')
-    list_display_links = ('id', 'skills')
-    search_fields = ('skills', 'education')
+    list_display = ('id','user', 'skills', 'experience', 'education')
+    list_display_links = ('id', 'user', 'skills')
+    search_fields = ('id', 'experience', 'education')
