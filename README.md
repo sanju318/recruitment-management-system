@@ -3,7 +3,7 @@
 A Django-based backend system that streamlines the recruitment process — from job posting and candidate management to interview scheduling and status tracking. Built with Django and Django REST Framework (DRF), this system is designed to handle real-world recruitment workflows efficiently.
 
 
- **Features**
+ ====> **Features**
 
  User Authentication – Signup/login system with OTP verification.
 
@@ -22,7 +22,7 @@ A Django-based backend system that streamlines the recruitment process — from 
 
 
 
-==> **Tools & Technologies**
+====> **Tools & Technologies**
 
 | Category            | Tools & Frameworks                     |
 | ------------------- | -------------------------------------- |
@@ -34,7 +34,7 @@ A Django-based backend system that streamlines the recruitment process — from 
 
 
 
-==> **Authentication System**
+====> **Authentication System**
 
 OTP generation for secure signups
 
@@ -43,7 +43,7 @@ timezone.now() used to track OTP expiry
 Passwords are hashed using make_password() for security
 
 
-==> **API Endpoints**
+====> **API Endpoints**
 
 All endpoints are tested using Postman.
 Some key routes:
@@ -60,7 +60,7 @@ POST /interview/ – Schedule interview for candidate
 
 
 
-==> **How to Run the Project ?**
+====> **How to Run the Project ?**
 
 
 git clone https://github.com/yourusername/recruitment-management-system.git
@@ -79,7 +79,7 @@ python manage.py migrate
 
 python manage.py runserver
 
-**Admin**
+====> **Admin**
 
 python manage.py createsuperuser
 
