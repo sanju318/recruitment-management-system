@@ -83,6 +83,12 @@ python manage.py runserver
 
 python manage.py createsuperuser
 
+====> **Testing**
+
+All APIs tested using Postman.
+
+File uploads and OTP login fully verified.
+
 
 
 
