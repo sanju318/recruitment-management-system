@@ -1,93 +1,136 @@
-# recruitment-management-system
+# 💼 Recruitment Management System (RMS)
 
-A Django-based backend system that streamlines the recruitment process — from job posting and candidate management to interview scheduling and status tracking. Built with Django and Django REST Framework (DRF), this system is designed to handle real-world recruitment workflows efficiently.
+A scalable and secure **Django + Django REST Framework**-based backend system designed to streamline and automate the recruitment lifecycle — from **job postings** and **resume collection** to **interview scheduling** and **candidate tracking**.
+
+## 📌 Business Overview
+
+The Recruitment Management System (RMS) provides companies and hiring teams with an efficient way to manage the recruitment pipeline through role-based access and automated processes. Key stakeholders include:
+
+- **Admins**: Full control over users, roles, and recruitment data.
+- **Recruiters**: Can create job posts, review candidates, and schedule interviews.
+- **Candidates**: Can sign up, upload resumes, and track application progress.
+
+## ✨ Key Features
+
+| Category                 | Description                                                                 |
+|--------------------------|-----------------------------------------------------------------------------|
+| 🔐 **User Authentication** | OTP-based signup and secure password login system                           |
+| 👥 **Role Management**      | Supports Admin, Recruiter, and Candidate roles with RBAC                    |
+| 📄 **Job Posting**         | Recruiters can create, update, and delete job listings                      |
+| 📎 **Resume Uploads**      | Candidates can upload and manage their resumes                             |
+| 📅 **Interview Scheduling**| Interviews can be scheduled and tracked by recruiters                       |
+| 🧭 **Status Tracking**     | Admins and recruiters can monitor candidate progress                        |
+| 📊 **Admin Panel**         | Centralized data control via Django Admin dashboard                         |
+| 🔍 **Postman Tested APIs** | All APIs validated through real-world testing using Postman                 |
+
+## 🛠️ Tech Stack
+
+| Layer               | Tools & Technologies                         |
+|---------------------|-----------------------------------------------|
+| **Backend**         | Django, Django REST Framework (DRF)           |
+| **Authentication**  | OTP System, Hashed Passwords                  |
+| **Database**        | SQLite (for dev), MySQL (for production use)  |
+| **API Testing**     | Postman                                       |
+| **Version Control** | Git                                           |
+| **Environment**     | Python 3.8+                                   |
+
+## 🔒 Authentication System
+
+- **OTP-Based Signup**: Generated OTP stored in DB with expiry using `timezone.now()`
+- **Password Security**: Passwords hashed using Django’s `make_password()`
+- **Token Authentication (optional)**: Can integrate DRF’s token or JWT for sessionless auth
+
+## 🚀 API Endpoints (Sample)
+
+| Method | Endpoint           | Description                            |
+|--------|--------------------|----------------------------------------|
+| POST   | `/signup/`         | Register user with OTP verification    |
+| POST   | `/login/`          | Login with username and password       |
+| POST   | `/job/`            | Create a new job post                  |
+| GET    | `/candidate/`      | List all registered candidates         |
+| POST   | `/interview/`      | Schedule an interview for a candidate  |
+
+## 🧩 Project Structure
+
+```bash
+recruitment-management-system/
+├── RMS/                        # Django project folder
+│   ├── settings.py
+│   ├── urls.py
+│   └── ...
+├── main_app/                   # Core app for roles, jobs, interviews
+│   ├── models.py
+│   ├── views.py
+│   ├── serializers.py
+│   └── urls.py
+├── media/                      # Resume and file uploads
+├── static/                     # Static files (if used)
+├── requirements.txt            # Python dependencies
+└── manage.py
+```
 
 
- ====> **Features**
 
- User Authentication – Signup/login system with OTP verification.
+## 🛠️ Project Setup Guide
 
- Role Management – Admin, recruiter, and candidate roles with access control.
-
- Job Posting – Create and manage job listings.
-
- Resume Uploads – Candidates can submit resumes via the system.
-
- Interview Scheduling – Schedule and track interview dates with status updates.
-
- Admin Panel – Manage all data via Django’s built-in admin dashboard.
-
- API Tested with Postman – All endpoints are tested using Postman collections.
-
-
-
-
-====> **Tools & Technologies**
-
-| Category            | Tools & Frameworks                     |
-| ------------------- | -------------------------------------- |
-| **Backend**         | Django, Django REST Framework (DRF)    |
-| **Database**        | SQLite (development), MySQL (optional) |
-| **API Testing**     | Postman                                |
-| **Authentication**  | OTP + Password-based                   |
-| **Version Control** | Git                                    |
-
-
-
-====> **Authentication System**
-
-OTP generation for secure signups
-
-timezone.now() used to track OTP expiry
-
-Passwords are hashed using make_password() for security
-
-
-====> **API Endpoints**
-
-All endpoints are tested using Postman.
-Some key routes:
-
-POST /signup/ – User registration with OTP
-
-POST /login/ – Authenticated user login
-
-POST /job/ – Create a new job post
-
-GET /candidate/ – List all candidates
-
-POST /interview/ – Schedule interview for candidate
-
-
-
-====> **How to Run the Project ?**
-
-
+**1. Clone the Repository**
+```bash
 git clone https://github.com/yourusername/recruitment-management-system.git
-
 cd recruitment-management-system/RMS
+```
 
+**2. Create Virtual Environment**
+```bash
 python -m venv venv
+```
 
- Windows use : venv\Scripts\activate , IOS : source venv/bin/activate  
+**3. Activate Virtual Environment**
+- Windows:
+```bash
+venv\Scripts\activate
+```
+- macOS/Linux:
+```bash
+source venv/bin/activate
+```
 
-pip install -r requirements.txt
+**4. Install Dependencies**
+```bash
+pip install -r ../requirements.txt
+```
 
+**5. Database Setup**
+```bash
 python manage.py makemigrations
-
 python manage.py migrate
+```
 
+**6. Run the Server**
+```bash
 python manage.py runserver
+```
 
-====> **Admin**
 
+## 🔑 Create Admin User
+```bash
 python manage.py createsuperuser
+```
+Visit `http://127.0.0.1:8000/admin/` to log in with admin credentials.
 
-====> **Testing**
 
-All APIs tested using Postman.
+## 🧭 Future Enhancements
 
-File uploads and OTP login fully verified.
+- Frontend integration (React/Angular)
+- Notification system (email/SMS for interview updates)
+- Candidate shortlisting & offer letter automation
+
+## 🤝 Contributing
+
+Contributions are welcome! Please fork the repository and open a pull request with your updates.  
+
+## 📄 License
+
+MIT License – feel free to use, modify, and distribute with attribution.
 
 
 
