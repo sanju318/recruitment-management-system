@@ -6,7 +6,7 @@ urlpatterns = [
     path('login/',login),
     path('signup/',signup),
     path('generate_otp/',generate_otp),
-    # path('filter_by/',filter_by),
+    path('filter_by/',filter_by),
     
 ]
 # ✅ Only in development
