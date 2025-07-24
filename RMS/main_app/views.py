@@ -34,7 +34,7 @@ def signup(request):
         role_id = data.get("role")  # should be a string or int
         role = Role.objects.get(id=role_id)
     except Role.DoesNotExist:
-        return Response({"error": "Invalid role ID"}, status=400)
+        return Response({"error": "Invalid role ID"}, status=400)  
 
     # Extract other fields
     username = data.get("username")
@@ -104,16 +104,16 @@ def generate_otp(request):
     except UserInformation.DoesNotExist:
         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
     
-@api_view(["GET"])
-def filter_by(request):
-    # name = request.GET.get('username', '')
+# @api_view(["GET"])
+# def filter_by(request):
+#     # name = request.GET.get('username', '')
 
-    # data = UserInformation.objects.filter(username__icontains=name).values()
-    # return Response(list(data))
+#     # data = UserInformation.objects.filter(username__icontains=name).values()
+#     # return Response(list(data))
 
-    id = request.GET.get('id', '')
+#     id = request.GET.get('id', '')
 
-    data = UserInformation.objects.filter(id__icontains=id).values()
-    return Response(list(data))
+#     data = UserInformation.objects.filter(id__icontains=id).values()
+#     return Response(list(data))
     
 
