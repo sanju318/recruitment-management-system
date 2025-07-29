@@ -1,5 +1,5 @@
 from django.contrib import admin
-from main_app.models import UserInformation, Role, JobPost, InterviewScheduling, CandidateStatus, Skills, JobDesignation, AppliedJobs
+from main_app.models import UserInformation, Role, JobPost, InterviewScheduling, CandidateStatus, Skills, JobDesignation, AppliedJobs, SavedJobs
 
 admin.site.site_title = 'RMS'
 admin.site.site_header = 'RMS'
@@ -38,6 +38,11 @@ class JobDesignationAdmin(admin.ModelAdmin):
 
 @admin.register(AppliedJobs)
 class AppliedJobsAdmin(admin.ModelAdmin):
+    list_display = ('user', 'job_post')
+    list_display_links = ('user', 'job_post')
+
+@admin.register(SavedJobs)
+class SavedJobsAdmin(admin.ModelAdmin):
     list_display = ('user', 'job_post')
     list_display_links = ('user', 'job_post')
 

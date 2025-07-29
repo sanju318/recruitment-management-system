@@ -10,11 +10,11 @@ class UserInformation(models.Model):
     profile_image = models.ImageField(upload_to='profile_images/',null=True,blank=True)
     username = models.CharField(unique=True,max_length=20)
     email = models.EmailField(max_length=254)
-    phone = models.IntegerField()
+    phone = models.CharField(max_length=15)
     role = models.ForeignKey(Role,on_delete=models.CASCADE)
     password = models.CharField(max_length=50)
-    otp = models.CharField(max_length=6)
-    otp_created_at = models.DateTimeField(null=True, blank=True)
+    otp = models.CharField(max_length=6,null=True,blank=True)
+    otp_created_at = models.DateTimeField(auto_now_add=True,null=True, blank=True)
     is_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -62,6 +62,11 @@ class JobDesignation(models.Model):
         return self.name
     
 class AppliedJobs(models.Model):
+    user = models.ForeignKey(UserInformation,on_delete=models.CASCADE)
+    job_post = models.ForeignKey(JobPost, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class SavedJobs(models.Model):
     user = models.ForeignKey(UserInformation,on_delete=models.CASCADE)
     job_post = models.ForeignKey(JobPost, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
