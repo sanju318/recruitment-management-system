@@ -10,7 +10,9 @@ from django.contrib.auth.hashers import check_password #for hash password
 from django.contrib.auth.hashers import make_password  #for hash password
 from .models import UserInformation,Role,JobPost,InterviewScheduling,CandidateStatus,JobDesignation
 from .serializers import LoginSerializer,SignupSerializer,UserSerializer
-
+from utils.generateOTP import generate_otp
+from utils.sendMail import send_html_email
+# ,sendMail
 
 #sign up api(using serializer)
 class SignupAPIview(APIView):
@@ -36,10 +38,36 @@ class SignupAPIview(APIView):
                 username = serializer.data.get("username")
                 email = serializer.data.get("email")
                 phone = serializer.data.get("phone")
-                password=hashed_password    ,
-                otp = serializer.data.get("otp")
+                password=hashed_password
+                otp = generate_otp()
                 profile_image = serializer.data.get("profile_image")
+            subject = f"Your Verification Code is {otp}"
+            html = html = f"""
+                            <html>
+                            <body style="font-family: Arial, sans-serif; background-color: #f4f6f8; padding: 30px; color: #333;">
+                                <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                
+                                <h2 style="color: #2d3436;">Recruitment Management System - Email Verification</h2>
+                                
+                                <p>Dear Candidate,</p>
+                                
+                                <p>Thank you for registering with the <strong>Recruitment Management System (RMS)</strong>. To complete your account setup and begin your journey with us, please use the following One-Time Password (OTP) to verify your email address:</p>
+                                
+                                <p style="font-size: 26px; font-weight: bold; color: #1e88e5; letter-spacing: 2px; text-align: center; margin: 30px 0;">{otp}</p>
+                                
+                                <p>This OTP is valid for <strong>10 minutes</strong>. Please do not share it with anyone.</p>
+                                
+                                <p>If you did not initiate this request, please ignore this email or contact our support team.</p>
 
+                                <br>
+                                <p>Warm regards,</p>
+                                <p><strong>RMS Support Team</strong><br>
+                                    Recruitment Management System</p>
+                                </div>
+                            </body>
+                            </html>
+                           """
+            send_html_email(subject,html,email)
             # data for Create user
             user = UserInformation.objects.create(
                 username=username,
@@ -81,46 +109,49 @@ def login(request):
     data = request.data
     # print(data)
     serializer = LoginSerializer(data=data)
+    print("===============================",serializer.is_valid())
     # print(serializer.is_valid())
     if serializer.is_valid():
         # print(serializer.data)
         username = serializer.data.get("username")
         password = serializer.data.get("password")
-
+        print('================')
         try:
             user = UserInformation.objects.get(username=username)        
+            print(user)
             if check_password(password,user.password):
                 return Response({"message": "Login successful", "username": user.username}, status=status.HTTP_200_OK)
             else:
-                return Response({"error": "Invalid password"}, status=status.HTTP_401_UNAUTHORIZED)
+                return Response({"error": "Invalid password "}, status=status.HTTP_401_UNAUTHORIZED)
 
         except UserInformation.DoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    return Response({"error": serializer.errors }, status=status.HTTP_404_NOT_FOUND)
     
 
-@api_view(["POST"]) 
-def generate_otp(request):
-    username = request.data.get("username")
+# @api_view(["POST"]) 
+# def generate_otp(request):
+#     username = request.data.get("username")
     
-    try:
-        user = UserInformation.objects.get(username=username)
+#     try:
+#         user = UserInformation.objects.get(username=username)
         
-        otp_code = str(random.randint(100000, 999999))
+#         otp_code = str(random.randint(100000, 999999))
         
-        user_otp = otp_code
-        user.otp_created_at = timezone.now()
-        user.save()
+#         user_otp = otp_code
+#         user.otp_created_at = timezone.now()
+#         user.save()
         
-        print(f"otp sent to {user.username}:{otp_code}")
+#         print(f"otp sent to {user.username}:{otp_code}")
 
-        return Response({ 
-            "message": "OTP generated and stored successfully",
-            "username": user.username,
-            "otp": otp_code
-        }, status=status.HTTP_200_OK)
+#         return Response({ 
+#             "message": "OTP generated and stored successfully",
+#             "username": user.username,
+#             "otp": otp_code
+#         }, status=status.HTTP_200_OK)
         
-    except UserInformation.DoesNotExist:
-        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+#     except UserInformation.DoesNotExist:
+#         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
     
 @api_view(["GET"])
