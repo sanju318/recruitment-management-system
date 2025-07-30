@@ -1,7 +1,7 @@
 import smtplib
 from email.message import EmailMessage
 
-# 🔐 Fixed sender credentials
+# Fixed sender credentials
 SENDER_EMAIL = "sp9872239@gmail.com"
 SENDER_PASSWORD = "psul tjpb wxbh qgjf"
 
@@ -11,7 +11,7 @@ def send_html_email(subject, html_content, to_email):
 
     Parameters:
     - subject (str): Email subject
-    - html_content (str): HTML content of the email
+    - html_content (str): HTML content of the email page design
     - to_email (str): Recipient email address
     """
 

@@ -9,7 +9,7 @@ from rest_framework import status # import for login api
 from django.contrib.auth.hashers import check_password #for hash password
 from django.contrib.auth.hashers import make_password  #for hash password
 from .models import UserInformation,Role,JobPost,InterviewScheduling,CandidateStatus,JobDesignation
-from .serializers import LoginSerializer,SignupSerializer,UserSerializer
+from .serializers import LoginSerializer,SignupSerializer,UserSerializer,FilterSerializer
 from utils.generateOTP import generate_otp
 from utils.sendMail import send_html_email
 # ,sendMail
@@ -17,8 +17,7 @@ from utils.sendMail import send_html_email
 #sign up api(using serializer)
 class SignupAPIview(APIView):
     def post(self,request):
-        data=request.data
-        serializer = SignupSerializer(data= data)
+        serializer = SignupSerializer(data= request.data)
         
         if serializer.is_valid():
             data = serializer.data
@@ -104,30 +103,28 @@ class AdminAPIView(generics.ListAPIView):
 
 # login api
     
-@api_view(["POST"])
-def login(request):
-    data = request.data
-    # print(data)
-    serializer = LoginSerializer(data=data)
-    print("===============================",serializer.is_valid())
-    # print(serializer.is_valid())
-    if serializer.is_valid():
-        # print(serializer.data)
-        username = serializer.data.get("username")
-        password = serializer.data.get("password")
-        print('================')
-        try:
-            user = UserInformation.objects.get(username=username)        
-            print(user)
-            if check_password(password,user.password):
-                return Response({"message": "Login successful", "username": user.username}, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": "Invalid password "}, status=status.HTTP_401_UNAUTHORIZED)
+class LoginAPIView(APIView):
+    def post(self,request):
+        # print(data)
+        serializer = LoginSerializer(data=request.data)
+        # print("===============================",serializer.is_valid())
+        # print(serializer.is_valid())
+        if serializer.is_valid():
+            # print(serializer.data)
+            username = serializer.data.get("username")
+            password = serializer.data.get("password")
+            try:
+                user = UserInformation.objects.get(username=username)        
+                # print(user)
+                if check_password(password,user.password):
+                    return Response({"message": "Login successful", "username": user.username}, status=status.HTTP_200_OK)
+                else:
+                    return Response({"error": "Invalid password "}, status=status.HTTP_401_UNAUTHORIZED)
 
-        except UserInformation.DoesNotExist:
-            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-    return Response({"error": serializer.errors }, status=status.HTTP_404_NOT_FOUND)
-    
+            except UserInformation.DoesNotExist:
+                return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"error": serializer.errors }, status=status.HTTP_404_NOT_FOUND)
+        
 
 # @api_view(["POST"]) 
 # def generate_otp(request):
@@ -153,18 +150,29 @@ def login(request):
 #     except UserInformation.DoesNotExist:
 #         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
+class FilterAPIView(generics.ListAPIView):
+    serializer_class = FilterSerializer
     
-@api_view(["GET"])
-def filter_by(request):
-    # name = request.GET.get('username', '')
+    def get_queryset(self):
+        username = self.request.query_params.get('username', '')
+        return UserInformation.objects.filter(username__icontains=username)
 
-    # data = UserInformation.objects.filter(username__icontains=name).values()
-    # return Response(list(data))
 
-    id = request.GET.get('id', '')
 
-    data = UserInformation.objects.filter(id__icontains=id).values()
-    return Response(list(data))
+
+
+
+# class FilterAPIView(APIView):
+#     def get(self,request):
+#         # name = request.GET.get('username', '')
+
+#         # data = UserInformation.objects.filter(username__icontains=name).values()
+#         # return Response(list(data))
+
+#         id = request.GET.get('id', '')
+
+#         data = UserInformation.objects.filter(id__icontains=id).values()
+#         return Response(list(data))
     
 
 
