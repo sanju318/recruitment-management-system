@@ -1,21 +1,19 @@
 import random
 from django.utils import timezone
+from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from django.shortcuts import render
 from rest_framework.response import Response
-from rest_framework import status # import for login api 
+from rest_framework import status # import for login api
 from django.contrib.auth.hashers import check_password #for hash password
 from django.contrib.auth.hashers import make_password  #for hash password
 from .models import UserInformation,Role,JobPost,InterviewScheduling,CandidateStatus,JobDesignation
 from .serializers import LoginSerializer,SignupSerializer,UserSerializer
 
 
-
-
-
 #sign up api(using serializer)
-class SignupAPIview(APIView): 
+class SignupAPIview(APIView):
     def post(self,request):
         data=request.data
         serializer = SignupSerializer(data= data)
@@ -54,13 +52,31 @@ class SignupAPIview(APIView):
             )
 
             return Response({"message": "User created", "user_id": user.id})
-from rest_framework import generics
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+#get all users
+
 class UserAPIview(generics.ListAPIView):
     queryset = UserInformation.objects.all()
     serializer_class = UserSerializer
+#only candidate
+class CandidateAPIView(generics.ListAPIView):
+    queryset = UserInformation.objects.filter(role__name__iexact='candidate')
+    serializer_class = UserSerializer
+#only recruiter
+class RecruiterAPIView(generics.ListAPIView):
+    queryset = UserInformation.objects.filter(role__name__iexact='recruiter')
+    serializer_class = UserSerializer
+#only admin
+class AdminAPIView(generics.ListAPIView):
+    queryset = UserInformation.objects.filter(role__name__iexact='admin')
+    serializer_class = UserSerializer
+
+
 # login api
     
-@api_view(["POST"]) 
+@api_view(["POST"])
 def login(request):
     data = request.data
     # print(data)
@@ -97,7 +113,7 @@ def generate_otp(request):
         
         print(f"otp sent to {user.username}:{otp_code}")
 
-        return Response({
+        return Response({ 
             "message": "OTP generated and stored successfully",
             "username": user.username,
             "otp": otp_code
@@ -105,6 +121,7 @@ def generate_otp(request):
         
     except UserInformation.DoesNotExist:
         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
     
 @api_view(["GET"])
 def filter_by(request):

@@ -1,9 +1,12 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
-from .views import login,generate_otp,filter_by,SignupAPIview,UserAPIview
+from .views import login,generate_otp,filter_by,SignupAPIview,UserAPIview,CandidateAPIView,RecruiterAPIView,AdminAPIView
 urlpatterns = [
-    path('user/',UserAPIview.as_view()),
+    path('users/',UserAPIview.as_view()),
+    path('candidate/',CandidateAPIView.as_view()),
+    path('recruiter/',RecruiterAPIView.as_view()),
+    path('admin/',AdminAPIView.as_view()),
     path('login/',login),
     path('signup/',SignupAPIview.as_view()),
     path('generate_otp/',generate_otp),
