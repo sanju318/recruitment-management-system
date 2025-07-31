@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from main_app.models import UserInformation,Role
 from rest_framework.exceptions import ValidationError
+from django.contrib.auth.hashers import make_password
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
@@ -12,7 +13,11 @@ class LoginSerializer(serializers.Serializer):
 class SignupSerializer(serializers.ModelSerializer):
     class Meta :
         model = UserInformation
-        fields = ['username','email','phone','password','otp','role']
+        fields = ['username','email','phone','password','otp','role'] 
+        
+    def create(self, validated_data):
+        validated_data['password'] = make_password(validated_data['password'])
+        return super().create(validated_data)
     
     def validate(self,attr):
         print("===========",attr)

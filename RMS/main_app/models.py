@@ -109,5 +109,3 @@ class CandidateStatus(models.Model):
         return f"{self.user}"
 
 
-
-# Create your models here.

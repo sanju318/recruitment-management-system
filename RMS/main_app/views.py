@@ -43,28 +43,50 @@ class SignupAPIview(APIView):
             subject = f"Your Verification Code is {otp}"
             html = html = f"""
                             <html>
-                            <body style="font-family: Arial, sans-serif; background-color: #f4f6f8; padding: 30px; color: #333;">
-                                <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                                
-                                <h2 style="color: #2d3436;">Recruitment Management System - Email Verification</h2>
-                                
-                                <p>Dear Candidate,</p>
-                                
-                                <p>Thank you for registering with the <strong>Recruitment Management System (RMS)</strong>. To complete your account setup and begin your journey with us, please use the following One-Time Password (OTP) to verify your email address:</p>
-                                
-                                <p style="font-size: 26px; font-weight: bold; color: #1e88e5; letter-spacing: 2px; text-align: center; margin: 30px 0;">{otp}</p>
-                                
-                                <p>This OTP is valid for <strong>10 minutes</strong>. Please do not share it with anyone.</p>
-                                
-                                <p>If you did not initiate this request, please ignore this email or contact our support team.</p>
+                                <body style="margin: 0; padding: 0; background-color: #f1f3f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+                                    <div style="max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden;">
+                                    
+                                    <div style="background-color: #1e88e5; padding: 20px 30px;">
+                                        <h2 style="margin: 0; color: #ffffff; font-weight: 600; font-size: 24px;">
+                                        RMS Email Verification
+                                        </h2>
+                                    </div>
 
-                                <br>
-                                <p>Warm regards,</p>
-                                <p><strong>RMS Support Team</strong><br>
-                                    Recruitment Management System</p>
-                                </div>
-                            </body>
-                            </html>
+                                    <div style="padding: 30px;">
+                                        <p style="font-size: 16px; color: #333333;">Dear Candidate,</p>
+
+                                        <p style="font-size: 15px; line-height: 1.6; color: #555;">
+                                        Thank you for registering with the <strong style="color: #1e88e5;">Recruitment Management System (RMS)</strong>.
+                                        To complete your registration and activate your account, please use the One-Time Password (OTP) below:
+                                        </p>
+
+                                        <div style="text-align: center; margin: 40px 0;">
+                                        <span style="display: inline-block; padding: 16px 32px; background-color: #1e88e5; color: #ffffff; font-size: 28px; font-weight: bold; letter-spacing: 4px; border-radius: 8px;">
+                                            {otp}
+                                        </span>
+                                        </div>
+
+                                        <p style="font-size: 14px; color: #888888; text-align: center;">
+                                        This OTP is valid for <strong>10 minutes</strong>. Please do not share it with anyone.
+                                        </p>
+
+                                        <p style="font-size: 14px; line-height: 1.6; color: #666;">
+                                        If you did not request this verification, please disregard this email or contact our support team immediately.
+                                        </p>
+
+                                        <p style="margin-top: 40px; font-size: 15px; color: #333;">
+                                        Warm regards,<br>
+                                        <strong style="color: #1e88e5;">RMS Support Team</strong><br>
+                                        Recruitment Management System
+                                        </p>
+                                    </div>
+
+                                    <div style="background-color: #f1f3f5; text-align: center; padding: 15px; font-size: 12px; color: #999;">
+                                        © 2025 Recruitment Management System. All rights reserved.
+                                    </div>
+                                    </div>
+                                </body>
+                                </html>
                            """
             send_html_email(subject,html,email)
             # data for Create user
@@ -107,7 +129,7 @@ class LoginAPIView(APIView):
     def post(self,request):
         # print(data)
         serializer = LoginSerializer(data=request.data)
-        # print("===============================",serializer.is_valid())
+        print("===============================",serializer.is_valid())
         # print(serializer.is_valid())
         if serializer.is_valid():
             # print(serializer.data)
@@ -115,7 +137,10 @@ class LoginAPIView(APIView):
             password = serializer.data.get("password")
             try:
                 user = UserInformation.objects.get(username=username)        
-                # print(user)
+                print(user)
+                print("Password from request:", password)
+                print("Password from DB:", user.password)
+
                 if check_password(password,user.password):
                     return Response({"message": "Login successful", "username": user.username}, status=status.HTTP_200_OK)
                 else:
@@ -125,30 +150,6 @@ class LoginAPIView(APIView):
                 return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         return Response({"error": serializer.errors }, status=status.HTTP_404_NOT_FOUND)
         
-
-# @api_view(["POST"]) 
-# def generate_otp(request):
-#     username = request.data.get("username")
-    
-#     try:
-#         user = UserInformation.objects.get(username=username)
-        
-#         otp_code = str(random.randint(100000, 999999))
-        
-#         user_otp = otp_code
-#         user.otp_created_at = timezone.now()
-#         user.save()
-        
-#         print(f"otp sent to {user.username}:{otp_code}")
-
-#         return Response({ 
-#             "message": "OTP generated and stored successfully",
-#             "username": user.username,
-#             "otp": otp_code
-#         }, status=status.HTTP_200_OK)
-        
-#     except UserInformation.DoesNotExist:
-#         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
 class FilterAPIView(generics.ListAPIView):
     serializer_class = FilterSerializer
