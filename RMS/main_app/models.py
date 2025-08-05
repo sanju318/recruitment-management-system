@@ -9,7 +9,7 @@ class Role(models.Model):
 class UserInformation(models.Model):
     profile_image = models.ImageField(upload_to='profile_images/',null=True,blank=True)
     username = models.CharField(unique=True,max_length=20)
-    email = models.EmailField(max_length=254)
+    email = models.EmailField(unique=True,max_length=254)
     phone = models.CharField(max_length=15)
     role = models.ForeignKey(Role,on_delete=models.CASCADE)
     password = models.CharField(max_length=50)

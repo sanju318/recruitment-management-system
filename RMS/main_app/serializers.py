@@ -13,7 +13,7 @@ class LoginSerializer(serializers.Serializer):
 class SignupSerializer(serializers.ModelSerializer):
     class Meta :
         model = UserInformation
-        fields = ['username','email','phone','password','otp','role'] 
+        fields = ['username','email','phone','password','otp','role']
         
     def create(self, validated_data):
         validated_data['password'] = make_password(validated_data['password'])

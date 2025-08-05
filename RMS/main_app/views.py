@@ -51,10 +51,10 @@ class SignupAPIview(APIView):
                                         RMS Email Verification
                                         </h2>
                                     </div>
-
+                                    
                                     <div style="padding: 30px;">
                                         <p style="font-size: 16px; color: #333333;">Dear Candidate,</p>
-
+                                        
                                         <p style="font-size: 15px; line-height: 1.6; color: #555;">
                                         Thank you for registering with the <strong style="color: #1e88e5;">Recruitment Management System (RMS)</strong>.
                                         To complete your registration and activate your account, please use the One-Time Password (OTP) below:

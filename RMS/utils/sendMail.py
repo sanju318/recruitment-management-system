@@ -10,7 +10,6 @@ def send_html_email(subject, html_content, to_email):
     Send an HTML email via Gmail SMTP.
 
     Parameters:
-    - subject (str): Email subject
     - html_content (str): HTML content of the email page design
     - to_email (str): Recipient email address
     """
@@ -28,6 +27,6 @@ def send_html_email(subject, html_content, to_email):
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
             smtp.login(SENDER_EMAIL, SENDER_PASSWORD)
             smtp.send_message(msg)
-        print("HTML email sent successfully.")
+        print("Email sent successfully.")
     except Exception as e:
         print("Failed to send HTML email:", e)
