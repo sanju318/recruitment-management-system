@@ -142,6 +142,7 @@ class LoginAPIView(APIView):
                 print("Password from DB:", user.password)
 
                 if check_password(password,user.password):
+                    
                     return Response({"message": "Login successful", "username": user.username}, status=status.HTTP_200_OK)
                 else:
                     return Response({"error": "Invalid password "}, status=status.HTTP_401_UNAUTHORIZED)
