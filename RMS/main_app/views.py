@@ -1,45 +1,50 @@
 import random
 from django.utils import timezone
 from rest_framework import generics
+from rest_framework.decorators import action
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
+from rest_framework import viewsets, status
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status # import for login api
-from django.contrib.auth.hashers import check_password #for hash password
-from django.contrib.auth.hashers import make_password  #for hash password
-from .models import UserInformation,Role,JobPost,InterviewScheduling,CandidateStatus,JobDesignation
-from .serializers import LoginSerializer,SignupSerializer,UserSerializer,FilterSerializer
+from django.contrib.auth.hashers import make_password , check_password #for hash password
+from .models import UserInformation,Role
+from .serializers import LoginSerializer,SignupSerializer,UserSerializer
 from utils.generateOTP import generate_otp
 from utils.sendMail import send_html_email
-# ,sendMail
 
-#sign up api(using serializer)
-class SignupAPIview(APIView):
-    def post(self,request):
-        serializer = SignupSerializer(data= request.data)
-        
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = UserInformation.objects.all()
+    serializer_class = UserSerializer
+
+#sign up api
+def create(self, request, *args, **kwargs):
+        serializer = SignupSerializer(data=request.data)
         if serializer.is_valid():
-            data = serializer.data
-            
-            raw_password = data.get("password")  #for hash password
-            hashed_password = make_password(data.get(raw_password)) #for hash password
+            data = serializer.validated_data
 
+            # hash password
+            raw_password = data.get("password")
+            print("Before",raw_password)
+            hashed_password = make_password(raw_password)
+            print("After",hashed_password)
+
+            # check role
             try:
-                role_id = data.get("role")  # should be a string or int
+                role_id = data.get("role")
                 role = Role.objects.get(id=role_id)
             except Role.DoesNotExist:
-                return Response({"error": "Invalid role ID"}, status=400)  
+                return Response({"error": "Invalid role ID"}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Extract other fields
-            if serializer.is_valid():
-                print(serializer.data)
-                username = serializer.data.get("username")
-                email = serializer.data.get("email")
-                phone = serializer.data.get("phone")
-                password=hashed_password
-                otp = generate_otp()
-                profile_image = serializer.data.get("profile_image")
+            username = data.get("username")
+            email = data.get("email")
+            phone = data.get("phone")
+            profile_image = data.get("profile_image")
+            password=password
+            otp = generate_otp()
+
             subject = f"Your Verification Code is {otp}"
             html = html = f"""
                             <html>
@@ -91,143 +96,32 @@ class SignupAPIview(APIView):
             send_html_email(subject,html,email)
             # data for Create user
             user = UserInformation.objects.create(
-                username=username,
-                email=email,
-                phone=phone,
-                password=password,
-                otp=otp,
-                role=role,
-                profile_image=profile_image
-            )
+                    username=username,
+                    email=email,
+                    phone=phone,
+                    password = hashed_password,
+                    otp=otp,
+                    role=role,
+                    profile_image=profile_image
+                )
 
-            return Response({"message": "User created", "user_id": user.id})
+            return Response({"message": "User created", "user_id": user.id}, status=status.HTTP_201_CREATED)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-#get all users
-
-class UserAPIview(generics.ListAPIView):
-    queryset = UserInformation.objects.all()
-    serializer_class = UserSerializer
-#only candidate
-class CandidateAPIView(generics.ListAPIView):
-    queryset = UserInformation.objects.filter(role__name__iexact='candidate')
-    serializer_class = UserSerializer
-#only recruiter
-class RecruiterAPIView(generics.ListAPIView):
-    queryset = UserInformation.objects.filter(role__name__iexact='recruiter')
-    serializer_class = UserSerializer
-#only admin
-class AdminAPIView(generics.ListAPIView):
-    queryset = UserInformation.objects.filter(role__name__iexact='admin')
-    serializer_class = UserSerializer
-
-
 # login api
-    
-class LoginAPIView(APIView):
-    def post(self,request):
-        # print(data)
+@action(detail=False, methods=["post"], url_path="login")
+def login(self, request):
         serializer = LoginSerializer(data=request.data)
-        print("===============================",serializer.is_valid())
-        # print(serializer.is_valid())
         if serializer.is_valid():
-            # print(serializer.data)
-            username = serializer.data.get("username")
-            password = serializer.data.get("password")
+            username = serializer.validated_data.get("username")
+            password = serializer.validated_data.get("password")
             try:
-                user = UserInformation.objects.get(username=username)        
-                print(user)
-                print("Password from request:", password)
-                print("Password from DB:", user.password)
-
-                if check_password(password,user.password):
-                    
-                    return Response({"message": "Login successful", "username": user.username}, status=status.HTTP_200_OK)
+                user = UserInformation.objects.get(username=username)
+                if check_password(password, user.password):
+                    return Response({"message": "Login successful", "username": user.username})
                 else:
-                    return Response({"error": "Invalid password "}, status=status.HTTP_401_UNAUTHORIZED)
-
+                    return Response({"error": "Invalid password"}, status=status.HTTP_401_UNAUTHORIZED)
             except UserInformation.DoesNotExist:
                 return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-        return Response({"error": serializer.errors }, status=status.HTTP_404_NOT_FOUND)
-        
-
-class FilterAPIView(generics.ListAPIView):
-    serializer_class = FilterSerializer
-    
-    def get_queryset(self):
-        username = self.request.query_params.get('username', '')
-        return UserInformation.objects.filter(username__icontains=username)
-
-
-
-
-
-
-# class FilterAPIView(APIView):
-#     def get(self,request):
-#         # name = request.GET.get('username', '')
-
-#         # data = UserInformation.objects.filter(username__icontains=name).values()
-#         # return Response(list(data))
-
-#         id = request.GET.get('id', '')
-
-#         data = UserInformation.objects.filter(id__icontains=id).values()
-#         return Response(list(data))
-    
-
-
-
-
-#get all user
-
-# @api_view(["GET"])
-# def Recruiterview(request):
-#     method = request.method
-#     if method == "GET":
-#         #data = UserInformation.objects.all()
-#         userdata = UserInformation.objects.all()
-#         stf  = []
-#         print(request.method)
-#         for i in userdata:
-#             l = {"name":i.username,"email":i.email} #create dictionaty to show json data in postman
-#             stf.append(l)
-#         return Response(stf)
-
-
-#sign up api
-
-# @api_view(["POST"]) 
-# def signup(request):
-#     data = request.data.copy()  # make a mutable copy
-    
-#     raw_password = data.get("password")  #for hash password
-#     hashed_password = make_password(data.get(raw_password)) #for hash password
-
-#     try:
-#         role_id = data.get("role")  # should be a string or int
-#         role = Role.objects.get(id=role_id)
-#     except Role.DoesNotExist:
-#         return Response({"error": "Invalid role ID"}, status=400)  
-
-#     # Extract other fields
-#     username = data.get("username")
-#     email = data.get("email")
-#     phone = data.get("phone")
-#     password=hashed_password,
-#     otp = data.get("otp")
-#     profile_image = request.FILES.get("profile_image")
-
-#     # Create user
-#     user = UserInformation.objects.create(
-#         username=username,
-#         email=email,
-#         phone=phone,
-#         password=password,
-#         otp=otp,
-#         role=role,
-#         profile_image=profile_image
-#     )
-
-#     return Response({"message": "User created", "user_id": user.id})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
